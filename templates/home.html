@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome to Medical Hope{% endblock %}
+
+{% block content %}
+<div class="animate-fade" style="text-align: center; padding: 6rem 0;">
+    <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem; line-height: 1.1; color: var(--primary);">Secure Crowdfunding for<br><span style="color: var(--accent);">Medical Emergencies.</span></h1>
+    <p style="color: var(--text-muted); font-size: 1.125rem; max-width: 650px; margin: 0 auto 3rem;">We connect patients with compassionate donors. Transparency and trust are at the heart of everything we do.</p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{% url 'donation_list' %}" class="btn btn-accent" style="padding: 0.8rem 2rem;">Browse Campaigns</a>
+        <a href="{% url 'register' %}" class="btn btn-outline" style="padding: 0.8rem 2rem;">Start a Fundraiser</a>
+    </div>
+</div>
+
+<div style="margin-top: 4rem;">
+    <h2 style="text-align: center; margin-bottom: 3rem;">Recent Campaigns</h2>
+    <div class="grid grid-3">
+        {% for req in featured_requests %}
+        <div class="glass-card">
+            <h3 style="font-size: 1.25rem;">{{ req.title }}</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">To help {{ req.patient_name }}</p>
+            
+            <div class="progress-container">
+                <div class="progress-bar" style="width: {{ req.progress_percentage }}%;"></div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 1.5rem;">
+                <span>Raised: ₹{{ req.amount_raised }}</span>
+                <span>Goal: ₹{{ req.goal_amount }}</span>
+            </div>
+            
+            <a href="{% url 'donation_detail' req.id %}" class="btn btn-outline" style="width: 100%;">View Details</a>
+        </div>
+        {% empty %}
+        <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No active campaigns found. Be the first to start one!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

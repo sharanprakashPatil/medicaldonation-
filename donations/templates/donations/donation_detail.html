@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}{{ donation_request.title }} - Medical Hope{% endblock %}
+{% block content %}
+<div class="grid" style="grid-template-columns: 2fr 1fr; gap: 3rem;">
+    <div>
+        <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">{{ donation_request.title }}</h1>
+        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+            <span class="btn btn-outline" style="font-size: 0.8rem; padding: 0.25rem 0.75rem;">Verified</span>
+            <span style="color: var(--text-muted); font-size: 0.9rem;">Posted on {{ donation_request.created_at|date }}</span>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3>Medical Story</h3>
+            <p style="white-space: pre-line;">{{ donation_request.description }}</p>
+        </div>
+
+        <div class="glass-card">
+            <h3>Medical Details</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.85rem;">Patient</label>
+                    <p>{{ donation_request.patient_name }}</p>
+                </div>
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.85rem;">Diagnosis</label>
+                    <p>{{ donation_request.diagnosis }}</p>
+                </div>
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.85rem;">Hospital</label>
+                    <p>{{ donation_request.hospital_name }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="position: sticky; top: 100px; height: fit-content;">
+        <div class="glass-card">
+            <h3>Support this cause</h3>
+            <div class="progress-container" style="height: 1rem; margin: 1.5rem 0;">
+                <div class="progress-bar" style="width: {{ donation_request.progress_percentage }}%;"></div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-size: 1.5rem; font-weight: 700;">₹{{ donation_request.amount_raised }}</span>
+                <span style="color: var(--text-muted);">raised of ₹{{ donation_request.goal_amount }}</span>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem;">Help us reach the goal for {{ donation_request.patient_name }}'s treatment.</p>
+
+            <form action="{% url 'initiate_payment' donation_request.id %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Amount to Donate (₹)</label>
+                    <input type="number" name="amount" class="form-control" placeholder="Enter amount" required min="10">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Donate with Razorpay</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

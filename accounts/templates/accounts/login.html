@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Login - Medical Hope{% endblock %}
+{% block content %}
+<div class="glass-card" style="max-width: 400px; margin: 4rem auto;">
+    <div style="display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 2rem;">
+        <h2 id="login-title">User Login</h2>
+    </div>
+    
+    <form method="post" id="login-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_username">Username</label>
+            <input type="text" name="username" id="id_username" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="id_password">Password</label>
+            <input type="password" name="password" id="id_password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Login</button>
+        <div style="text-align: right; margin-top: 0.5rem;">
+            <a href="{% url 'forgot_password' %}" style="font-size: 0.85rem; color: var(--text-muted);">Forgot password?</a>
+        </div>
+    </form>
+    <p style="text-align: center; margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
+        Don't have an account? <a href="{% url 'register' %}">Sign up today</a><br>
+        <a href="javascript:void(0)" onclick="toggleAdmin()" id="admin-toggle" style="margin-top: 0.5rem; display: inline-block;">Login as Admin</a>
+    </p>
+</div>
+
+<script>
+function toggleAdmin() {
+    const title = document.getElementById('login-title');
+    const toggle = document.getElementById('admin-toggle');
+    if (title.innerText === 'User Login') {
+        title.innerText = 'Admin Login';
+        title.style.color = 'var(--accent)';
+        toggle.innerText = 'Login as User';
+    } else {
+        title.innerText = 'User Login';
+        title.style.color = 'var(--primary)';
+        toggle.innerText = 'Login as Admin';
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Donor Dashboard - Medical Hope{% endblock %}
+{% block content %}
+<div class="glass-card" style="text-align: center; padding: 4rem;">
+    <h1>Welcome back, {{ user.username }}!</h1>
+    <p style="color: var(--text-muted); margin: 1rem 0 2rem; font-size: 1.1rem;">Thank you for being part of our life-saving community.</p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{% url 'donation_list' %}" class="btn btn-primary">Find Campaigns to Support</a>
+        <a href="{% url 'home' %}" class="btn btn-outline">Go Home</a>
+    </div>
+</div>
+{% endblock %}

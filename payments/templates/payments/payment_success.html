@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Donation Success - Medical Hope{% endblock %}
+{% block content %}
+<div class="glass-card" style="max-width: 600px; margin: 4rem auto; text-align: center;">
+    <div style="font-size: 4rem; color: var(--success); margin-bottom: 1.5rem;">✓</div>
+    <h1 style="color: var(--success);">Donation Successful!</h1>
+    <p style="margin: 1.5rem 0 2rem; color: var(--text-muted);">Thank you for your generous contribution of ₹{{ transaction.amount }}. Your support helps provide critical medical care to those in need.</p>
+    
+    <div style="text-align: left; background: var(--glass); padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+        <p><strong>Payment ID:</strong> {{ transaction.payment_id }}</p>
+        <p><strong>Order ID:</strong> {{ transaction.order_id }}</p>
+        <p><strong>Campaign:</strong> {{ transaction.request.title }}</p>
+    </div>
+
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{% url 'donation_list' %}" class="btn btn-primary">Browse More</a>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline">My Dashboard</a>
+    </div>
+</div>
+{% endblock %}

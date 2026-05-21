@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}My Requests - Medical Hope{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>My Donation Campaigns</h1>
+    <a href="{% url 'create_request' %}" class="btn btn-accent">Start New Campaign</a>
+</div>
+
+<div class="grid grid-3">
+    {% for req in requests %}
+    <div class="glass-card">
+        <h3 style="font-size: 1.25rem;">{{ req.title }}</h3>
+        
+        <div style="margin: 1rem 0;">
+            {% if not req.is_verified %}
+                <span class="btn" style="background: var(--warning); color: black; font-size: 0.7rem; padding: 0.2rem 0.5rem; cursor: default;">Pending Verification</span>
+            {% elif not req.is_approved %}
+                <span class="btn" style="background: var(--accent); color: white; font-size: 0.7rem; padding: 0.2rem 0.5rem; cursor: default;">Verified (Awaiting Approval)</span>
+            {% else %}
+                <span class="btn" style="background: var(--success); color: white; font-size: 0.7rem; padding: 0.2rem 0.5rem; cursor: default;">Live</span>
+            {% endif %}
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" style="width: {{ req.progress_percentage }}%;"></div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 1.5rem;">
+            <span>Raised: ₹{{ req.amount_raised }}</span>
+            <span>Goal: ₹{{ req.goal_amount }}</span>
+        </div>
+        
+        <div style="display: flex; gap: 0.5rem;">
+            <a href="{% url 'upload_documents' req.id %}" class="btn btn-outline" style="flex: 1; font-size: 0.8rem;">Update Docs</a>
+            {% if req.is_approved %}
+                <a href="{% url 'donation_detail' req.id %}" class="btn btn-primary" style="flex: 1; font-size: 0.8rem;">View Public</a>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="glass-card" style="grid-column: 1 / -1; text-align: center; padding: 4rem;">
+        <h3>No campaigns found.</h3>
+        <p style="color: var(--text-muted); margin: 1rem 0 2rem;">You haven't created any medical donation requests yet.</p>
+        <a href="{% url 'create_request' %}" class="btn btn-primary">Create Your First Request</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
