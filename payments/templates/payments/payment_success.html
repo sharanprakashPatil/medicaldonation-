@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load receipt_tags %}
+{% block title %}Donation Success - Medical Hope{% endblock %}
+{% block content %}
+<div id="receipt" style="max-width: 750px; margin: 2rem auto; background: #fff; border-radius: 0.5rem; box-shadow: 0 4px 24px rgba(0,0,0,0.1); overflow: hidden;">
+    <div style="padding: 2.5rem 2.5rem 1.5rem;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="vertical-align: top;">
+                    <div style="font-size: 1.8rem; font-weight: 900; color: #1e40af; letter-spacing: 0.05em; line-height: 1.2;">MEDICAL<br>HOPE</div>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.75rem; color: #64748b;">Empowering Lives Through<br>Community Support</p>
+                </td>
+                <td style="text-align: right; vertical-align: top;">
+                    <div style="display: inline-block; border: 2px solid #1e40af; border-radius: 0.25rem; padding: 0.4rem 1.2rem;">
+                        <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: #1e40af; font-weight: 700;">&#10003; PAID</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="padding: 0 2.5rem;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding-bottom: 0.25rem; font-size: 0.85rem; color: #64748b;">123 Healthcare Avenue, MG Road, Mumbai - 400001</td>
+                <td style="text-align: right; padding-bottom: 0.25rem; font-size: 0.85rem; color: #64748b;">+91 98765 43210 | info@medicalhope.org</td>
+            </tr>
+        </table>
+        <hr style="border: none; border-top: 2px solid #e2e8f0; margin: 0.75rem 0;">
+        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 0 0 1.25rem;">
+    </div>
+
+    <div style="padding: 0 2.5rem 1.5rem;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="vertical-align: top; width: 50%;">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 0.5rem;">Donor</div>
+                    <p style="font-weight: 600; font-size: 1rem; margin: 0 0 0.15rem; color: #1e293b;">{{ donor_name }}</p>
+                    <p style="font-size: 0.85rem; margin: 0; color: #64748b;">{{ donation.donor_email }}</p>
+                </td>
+                <td style="vertical-align: top; text-align: right; width: 50%;">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 0.5rem;">Campaign</div>
+                    <p style="font-weight: 600; font-size: 1rem; margin: 0 0 0.15rem; color: #1e293b;">{{ donation_request.title }}</p>
+                    <p style="font-size: 0.85rem; margin: 0; color: #64748b;">Patient: {{ donation_request.patient_name }}</p>
+                    <p style="font-size: 0.85rem; margin: 0; color: #64748b;">{{ donation_request.hospital_name }}</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="background: #f8fafc; padding: 1.5rem 2.5rem;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Receipt No.</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-family: monospace; font-size: 0.85rem; font-weight: 700; color: #1e293b;">{{ transaction.payment_id|short_id:"RCP" }}</td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Transaction ID</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-family: monospace; font-size: 0.85rem; color: #1e293b;">{{ transaction.payment_id|short_id:"TXN" }}</td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Order ID</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-family: monospace; font-size: 0.85rem; color: #1e293b;">{{ transaction.order_id|short_id:"ORD" }}</td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Date</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-weight: 500; color: #1e293b;">{{ transaction.created_at|date:"d M Y" }}</td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Time</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-weight: 500; color: #1e293b;">{{ transaction.created_at|date:"h:i A" }}</td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Payment Mode</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-weight: 500; color: #1e293b;">{{ transaction.payment_method|default:"Razorpay" }}</td>
+            </tr>
+            <tr style="border-top: 2px solid #1e40af;">
+                <td style="padding: 0.75rem 0; font-size: 1rem; font-weight: 700; color: #1e293b;">Total Amount</td>
+                <td style="padding: 0.75rem 0; text-align: right; font-size: 1.4rem; font-weight: 800; color: #059669;">&#8377; {{ transaction.amount }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="padding: 1.5rem 2.5rem 2.5rem; text-align: center; position: relative;">
+        <div style="display: inline-block; width: 110px; height: 110px; border: 4px double #1e40af; border-radius: 50%; position: relative; margin-bottom: 0.5rem; background: #f8fafc;">
+            <div style="position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; border: 1px solid #1e40af; border-radius: 50%;"></div>
+            <div style="position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid #1e40af; border-radius: 50%;"></div>
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                <div style="font-size: 0.55rem; font-weight: 900; color: #1e40af; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.2;">MEDICAL<br>HOPE</div>
+                <div style="width: 24px; height: 2px; background: #1e40af; margin: 4px auto;"></div>
+                <div style="font-size: 0.65rem; color: #1e40af; font-weight: 700;">&#10003;</div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 0; right: 0; text-align: center;">
+                <span style="font-size: 0.4rem; color: #1e40af; letter-spacing: 0.1em;">SIGNATORY</span>
+            </div>
+        </div>
+        <p style="font-size: 0.75rem; color: #64748b; margin: 0.25rem 0 0; font-weight: 500;">Authorised Signatory</p>
+        <p style="font-size: 0.65rem; color: #94a3b8; margin: 0.25rem 0 0;">This is a computer-generated receipt and does not require a physical signature.</p>
+    </div>
+</div>
+
+<div style="text-align: center; margin-bottom: 3rem;">
+    <button onclick="printReceipt()" class="btn btn-primary" style="padding: 0.8rem 2rem; font-size: 1rem;">&#128229; Download Receipt</button>
+    <a href="{% url 'donation_list' %}" class="btn btn-outline" style="padding: 0.8rem 2rem;">Browse Campaigns</a>
+    <a href="{% url 'dashboard' %}" class="btn btn-outline" style="padding: 0.8rem 2rem;">Dashboard</a>
+</div>
+
+<style>
+@media print {
+    @page { margin: 0.5in; size: A4; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    nav, footer, .messages, .btn, .nav-links, [style*="text-align: center; margin-bottom: 3rem;"] { display: none !important; }
+    #receipt { box-shadow: none; border: 1px solid #ddd; margin: 0 auto; }
+}
+</style>
+<script>
+function printReceipt() { window.print(); }
+</script>
+{% endblock %}

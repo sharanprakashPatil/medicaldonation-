@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load receipt_tags %}
+{% block title %}{{ campaign.title }} - Admin{% endblock %}
+{% block content %}
+<div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">Back to Dashboard</a>
+    <h1 style="margin: 0;">{{ campaign.title }}</h1>
+</div>
+
+<div class="glass-card" style="margin-bottom: 2rem;">
+    <h3>Campaign Overview</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Patient</label>
+            <p style="font-weight: 600;">{{ campaign.patient_name }}</p>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Diagnosis</label>
+            <p style="font-weight: 600;">{{ campaign.diagnosis }}</p>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Hospital</label>
+            <p style="font-weight: 600;">{{ campaign.hospital_name }}</p>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Seeker</label>
+            <p style="font-weight: 600;">{{ campaign.user.username }} ({{ campaign.user.email }})</p>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Goal Amount</label>
+            <p style="font-weight: 600;">₹{{ campaign.goal_amount }}</p>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Amount Raised</label>
+            <p style="font-weight: 600; color: var(--success);">₹{{ campaign.amount_raised }}</p>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Total Donors</label>
+            <p style="font-weight: 600;">{{ total_donors }}</p>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Progress</label>
+            <p style="font-weight: 600;">{{ campaign.progress_percentage }}%</p>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Status</label>
+            <p style="font-weight: 600;">
+                {% if campaign.is_cancelled %}
+                    <span style="color: #64748b;">Cancelled</span>
+                {% elif campaign.is_rejected %}
+                    <span style="color: var(--danger);">Rejected</span>
+                {% elif campaign.is_granted %}
+                    <span style="color: var(--success);">Funds Granted</span>
+                {% elif campaign.is_approved %}
+                    <span style="color: var(--success);">Approved & Public</span>
+                {% elif campaign.is_verified %}
+                    <span style="color: var(--primary);">Verified (Awaiting Approval)</span>
+                {% elif campaign.is_submitted %}
+                    <span style="color: var(--warning);">Submitted for Review</span>
+                {% else %}
+                    <span style="color: #64748b;">Not Submitted Yet</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+    {% if campaign.account_holder_name %}
+    <div style="margin-top: 1rem; padding: 1rem; background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+        <h4 style="margin: 0 0 0.5rem; font-size: 0.9rem;">&#127974; Seeker Bank Details</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.5rem; font-size: 0.85rem;">
+            <div><span style="color: var(--text-muted);">A/c Holder:</span> <strong>{{ campaign.account_holder_name }}</strong></div>
+            <div><span style="color: var(--text-muted);">A/c No.:</span> <strong>****{{ campaign.account_number|slice:"-4:" }}</strong></div>
+            <div><span style="color: var(--text-muted);">Bank:</span> <strong>{{ campaign.bank_name }}</strong></div>
+            <div><span style="color: var(--text-muted);">IFSC:</span> <strong>{{ campaign.ifsc_code }}</strong></div>
+            {% if campaign.upi_id %}<div><span style="color: var(--text-muted);">UPI:</span> <strong>{{ campaign.upi_id }}</strong></div>{% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% if campaign.rejection_reason %}
+    <div style="margin-top: 1rem; padding: 1rem; background: #fef2f2; border-radius: 0.5rem; border-left: 4px solid var(--danger);">
+        <h4 style="color: var(--danger);">Rejection Reason</h4>
+        <p style="margin: 0.5rem 0 0;">{{ campaign.rejection_reason }}</p>
+    </div>
+    {% endif %}
+</div>
+
+<div class="glass-card">
+    <h3>Transaction History ({{ total_donors }} donations)</h3>
+    <div style="overflow-x: auto; margin-top: 1rem;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: var(--glass);">
+                <tr>
+                    <th style="padding: 0.75rem;">#</th>
+                    <th style="padding: 0.75rem;">Donor Name</th>
+                    <th style="padding: 0.75rem;">Email</th>
+                    <th style="padding: 0.75rem;">Amount</th>
+                    <th style="padding: 0.75rem;">Payment ID</th>
+                    <th style="padding: 0.75rem;">Date & Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for donation in donations %}
+                <tr style="border-top: 1px solid var(--surface-border);">
+                    <td style="padding: 0.75rem;">{{ forloop.counter }}</td>
+                    <td style="padding: 0.75rem; font-weight: 500;">{{ donation.donor_name }}</td>
+                    <td style="padding: 0.75rem;">{{ donation.donor_email }}</td>
+                    <td style="padding: 0.75rem; color: var(--success); font-weight: 600;">₹{{ donation.amount }}</td>
+                    <td style="padding: 0.75rem; font-family: monospace; font-size: 0.8rem;">{{ donation.payment_id|short_id:"TXN" }}</td>
+                    <td style="padding: 0.75rem;">{{ donation.timestamp|date:"d M Y h:i A" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-muted);">No donations yet for this campaign.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

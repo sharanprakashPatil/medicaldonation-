@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}My Profile - Medical Hope{% endblock %}
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <h1 style="margin-bottom: 2rem;">My Profile</h1>
+    <div class="glass-card" style="margin-bottom: 2rem;">
+        <h3>Profile Information</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+            <div>
+                <label style="color: var(--text-muted); font-size: 0.85rem;">Username</label>
+                <p style="font-weight: 600;">{{ user.username }}</p>
+            </div>
+            <div>
+                <label style="color: var(--text-muted); font-size: 0.85rem;">Full Name</label>
+                <p style="font-weight: 600;">{{ user.first_name|default:"Not set" }} {{ user.last_name|default:"" }}</p>
+            </div>
+            <div>
+                <label style="color: var(--text-muted); font-size: 0.85rem;">Email</label>
+                <p style="font-weight: 600;">{{ user.email }}</p>
+            </div>
+            <div>
+                <label style="color: var(--text-muted); font-size: 0.85rem;">Phone Number</label>
+                <p style="font-weight: 600;">{{ user.phone_number|default:"Not set" }}</p>
+            </div>
+            <div>
+                <label style="color: var(--text-muted); font-size: 0.85rem;">Account Type</label>
+                <p style="font-weight: 600;">
+                    {% if user.is_seeker %}Seeker{% endif %}
+                    {% if user.is_donor %}Donor{% endif %}
+                    {% if user.is_staff %}Admin{% endif %}
+                </p>
+            </div>
+            <div>
+                <label style="color: var(--text-muted); font-size: 0.85rem;">Joined</label>
+                <p style="font-weight: 600;">{{ user.date_joined|date:"d M Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    {% if not user.is_staff %}
+    <div class="glass-card" style="margin-bottom: 2rem;">
+        <h3>Edit Profile</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" name="phone_number" class="form-control" value="{{ user.phone_number|default:'' }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+        </form>
+    </div>
+
+    <div class="glass-card">
+        <h3>Change Password</h3>
+        <form method="post" action="{% url 'change_password' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Current Password</label>
+                <input type="password" name="old_password" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="password" name="new_password1" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Confirm New Password</label>
+                <input type="password" name="new_password2" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Change Password</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="{% url 'logout' %}" class="btn btn-outline" style="color: var(--danger); border-color: var(--danger);">Logout</a>
+    </div>
+</div>
+{% endblock %}

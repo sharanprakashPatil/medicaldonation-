@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Payment Failed - Medical Hope{% endblock %}
+{% block content %}
+<div class="glass-card" style="max-width: 600px; margin: 4rem auto; text-align: center;">
+    <div style="font-size: 4rem; color: var(--danger); margin-bottom: 1.5rem;">✕</div>
+    <h1 style="color: var(--danger);">Payment Failed</h1>
+    <p style="margin: 1.5rem 0 2rem; color: var(--text-muted);">Unfortunately, your transaction could not be completed. This might be due to a technical issue or an issue with your payment method.</p>
+    
+    <div style="background: var(--glass); padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2rem;">
+        <p>No funds have been deducted from your account. If you believe this is an error, please try again or contact support.</p>
+    </div>
+
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{% url 'donation_list' %}" class="btn btn-primary">Try Again</a>
+        <a href="{% url 'home' %}" class="btn btn-outline">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

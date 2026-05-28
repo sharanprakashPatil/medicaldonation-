@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Upload Documents - Medical Hope{% endblock %}
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+    <div class="glass-card" style="margin-bottom: 2rem;">
+        <h2 style="margin-bottom: 1rem;">&#128203; Required Documents</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.25rem;">Upload all 3 mandatory documents below to complete your campaign setup.</p>
+        {% if 'CERT' not in uploaded_types or 'ID' not in uploaded_types or 'BANK' not in uploaded_types %}
+        <div style="padding: 0.75rem 1rem; background: #fef2f2; border: 1px solid #fecaca; border-radius: 0.5rem; margin-bottom: 1rem;">
+            <p style="margin: 0; color: #dc2626; font-size: 0.85rem; font-weight: 500;">&#9888; You must upload all 3 documents (Medical Certificate, Identity Proof, and Bank Passbook) before proceeding. The "Done" button will be enabled once all are uploaded.</p>
+        </div>
+        {% endif %}
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% for type_code, type_name, type_desc in required_docs %}
+            {% if type_code in uploaded_types %}
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; border-radius: 0.5rem; background: #f0fdf4; border: 1px solid #bbf7d0;">
+                <div style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; background: #22c55e; color: #fff;">&#10003;</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600;">{{ type_name }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ type_desc }}</div>
+                </div>
+                <span style="font-size: 0.75rem; color: #16a34a; font-weight: 600;">Uploaded</span>
+            </div>
+            {% else %}
+            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; border-radius: 0.5rem; background: #fef2f2; border: 1px solid #fecaca;">
+                <div style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; border: 2px solid #ef4444; color: #ef4444;">&#10007;</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600;">{{ type_name }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ type_desc }}</div>
+                </div>
+                <span style="font-size: 0.75rem; color: #dc2626; font-weight: 600;">Missing</span>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="grid grid-2" style="gap: 2rem;">
+        <div class="glass-card">
+            <h3 style="margin-bottom: 1.5rem;">Upload Document</h3>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Document Type</label>
+                    <select name="document_type" class="form-control" required>
+                        <option value="">-- Select Type --</option>
+                        <option value="CERT">&#128196; Medical Report</option>
+                        <option value="ID">&#128179; Identity Proof</option>
+                        <option value="BANK">&#127974; Bank Passbook</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Choose File</label>
+                    <input type="file" name="document" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload</button>
+                {% if 'CERT' in uploaded_types and 'ID' in uploaded_types and 'BANK' in uploaded_types %}
+                    {% if donation_request.is_submitted %}
+                        <a href="{% url 'my_requests' %}" class="btn btn-outline" style="margin-left: 0.5rem;">Back to My Campaigns</a>
+                    {% else %}
+                        <a href="{% url 'submit_for_review' donation_request.id %}" class="btn btn-accent" style="margin-left: 0.5rem; font-weight: 700;">&#10004; Submit for Review</a>
+                    {% endif %}
+                {% else %}
+                <span style="display: inline-block; margin-left: 0.5rem; padding: 0.6rem 1.2rem; border-radius: 0.5rem; background: var(--surface-border); color: var(--text-muted); font-size: 0.9rem; cursor: not-allowed;">&#10004; Submit for Review</span>
+                {% endif %}
+            </form>
+        </div>
+
+        <div class="glass-card">
+            <h3 style="margin-bottom: 1rem;">All Uploaded Files</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Campaign: {{ donation_request.title }}</p>
+            <ul style="list-style: none;">
+                {% for doc in docs %}
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid var(--surface-border); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 500;">{{ doc.get_document_type_display }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ doc.uploaded_at|date:"d M Y h:i A" }}</div>
+                        </div>
+                        <a href="{{ doc.document.url }}" target="_blank" class="btn btn-accent" style="padding: 0.2rem 0.6rem; font-size: 0.75rem;">View</a>
+                    </li>
+                {% empty %}
+                    <p style="color: var(--text-muted);">No documents uploaded yet.</p>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

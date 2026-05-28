@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Manage {{ ticket.ticket_id }}{% endblock %}
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <a href="{% url 'admin_ticket_list' %}" style="display: inline-block; margin-bottom: 1.5rem;">&larr; Back to Tickets</a>
+    <div class="glass-card" style="margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 style="margin: 0;">{{ ticket.get_category_display }}</h2>
+            <span style="font-family: monospace; font-size: 0.85rem; color: var(--text-muted);">#{{ ticket.ticket_id }}</span>
+        </div>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">From: <strong>{{ ticket.user.username }}</strong> ({{ ticket.user.email }})</p>
+        <div style="background: var(--background); padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+            <p style="white-space: pre-line; margin: 0;">{{ ticket.message }}</p>
+        </div>
+        {% if ticket.admin_reply %}
+        <div style="background: #eef2ff; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border-left: 4px solid var(--accent);">
+            <h4 style="margin-bottom: 0.5rem; color: var(--accent);">Current Reply</h4>
+            <p style="white-space: pre-line; margin: 0;">{{ ticket.admin_reply }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="glass-card">
+        <h3>Respond to Ticket</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Update Status</label>
+                <select name="status" class="form-control">
+                    <option value="OPEN" {% if ticket.status == 'OPEN' %}selected{% endif %}>Open</option>
+                    <option value="IN_PROGRESS" {% if ticket.status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                    <option value="RESOLVED" {% if ticket.status == 'RESOLVED' %}selected{% endif %}>Resolved</option>
+                    <option value="CLOSED" {% if ticket.status == 'CLOSED' %}selected{% endif %}>Closed</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Admin Reply</label>
+                <textarea name="admin_reply" class="form-control" rows="5" placeholder="Write your response to the user...">{% if ticket.admin_reply %}{{ ticket.admin_reply }}{% endif %}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Ticket</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

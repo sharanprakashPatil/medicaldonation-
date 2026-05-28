@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}All Campaigns - Admin{% endblock %}
+{% block content %}
+<div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">Back to Dashboard</a>
+    <h1 style="margin: 0;">All Campaigns</h1>
+</div>
+
+<div class="glass-card" style="margin-bottom: 2rem;">
+    <div style="display: flex; gap: 2rem;">
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Total Campaigns</label>
+            <p style="font-size: 1.5rem; font-weight: 800; margin: 0;">{{ campaigns|length }}</p>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Total Funds Collected</label>
+            <p style="font-size: 1.5rem; font-weight: 800; margin: 0; color: var(--success);">₹{{ total_collected }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="glass-card">
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: var(--glass);">
+                <tr>
+                    <th style="padding: 0.75rem;">#</th>
+                    <th style="padding: 0.75rem;">Campaign</th>
+                    <th style="padding: 0.75rem;">Seeker</th>
+                    <th style="padding: 0.75rem;">Goal</th>
+                    <th style="padding: 0.75rem;">Collected</th>
+                    <th style="padding: 0.75rem;">Donors</th>
+                    <th style="padding: 0.75rem;">Status</th>
+                    <th style="padding: 0.75rem;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in campaigns %}
+                <tr style="border-top: 1px solid var(--surface-border);">
+                    <td style="padding: 0.75rem;">{{ forloop.counter }}</td>
+                    <td style="padding: 0.75rem; font-weight: 600;">{{ c.title }}</td>
+                    <td style="padding: 0.75rem;">{{ c.user.username }}</td>
+                    <td style="padding: 0.75rem;">₹{{ c.goal_amount }}</td>
+                    <td style="padding: 0.75rem; color: var(--success); font-weight: 600;">₹{{ c.amount_raised }}</td>
+                    <td style="padding: 0.75rem;">{{ c.donation_count }}</td>
+                    <td style="padding: 0.75rem;">
+                        {% if c.is_cancelled %}
+                            <span style="color: #64748b;">Cancelled</span>
+                        {% elif c.is_rejected %}
+                            <span style="color: var(--danger);">Rejected</span>
+                        {% elif c.is_granted %}
+                            <span style="color: var(--success);">Granted</span>
+                        {% elif c.is_approved %}
+                            <span style="color: var(--success);">Approved</span>
+                        {% elif c.is_verified %}
+                            <span style="color: var(--accent);">Verified</span>
+                        {% else %}
+                            <span style="color: var(--warning);">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 0.75rem;">
+                        <a href="{% url 'admin_campaign_detail' c.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" style="padding: 2rem; text-align: center; color: var(--text-muted);">No campaigns found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Login - Medical Hope{% endblock %}
+{% block content %}
+<div class="glass-card" style="max-width: 450px; margin: 4rem auto;">
+    <div style="display: flex; border-bottom: 2px solid var(--surface-border); margin-bottom: 1.5rem;">
+        <button id="tab-user" onclick="switchTab('user')" style="flex: 1; padding: 0.75rem; background: var(--primary); color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 0.5rem 0.5rem 0 0;">User Login</button>
+        <button id="tab-admin" onclick="switchTab('admin')" style="flex: 1; padding: 0.75rem; background: var(--background); color: var(--text-muted); border: none; font-weight: 600; cursor: pointer; border-radius: 0.5rem 0.5rem 0 0;">Admin Login</button>
+    </div>
+
+    <form id="user-form" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="login_type" value="user">
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" name="username" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Login as</label>
+            <select name="role" class="form-control" required>
+                <option value="" disabled selected>-- Select Role --</option>
+                <option value="donor">Donor</option>
+                <option value="seeker">Seeker</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Login</button>
+        <div style="text-align: right; margin-top: 0.5rem;">
+            <a href="{% url 'forgot_password' %}" style="font-size: 0.85rem; color: var(--text-muted);">Forgot password?</a>
+        </div>
+    </form>
+
+    <form id="admin-form" method="post" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="login_type" value="admin">
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" name="username" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-accent" style="width: 100%; margin-top: 1rem;">Login as Admin</button>
+        <div style="text-align: right; margin-top: 0.5rem;">
+            <a href="{% url 'forgot_password' %}" style="font-size: 0.85rem; color: var(--text-muted);">Forgot password?</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function switchTab(tab) {
+    const userTab = document.getElementById('tab-user');
+    const adminTab = document.getElementById('tab-admin');
+    const userForm = document.getElementById('user-form');
+    const adminForm = document.getElementById('admin-form');
+    if (tab === 'user') {
+        userTab.style.background = 'var(--primary)';
+        userTab.style.color = '#fff';
+        adminTab.style.background = 'var(--background)';
+        adminTab.style.color = 'var(--text-muted)';
+        userForm.style.display = 'block';
+        adminForm.style.display = 'none';
+    } else {
+        adminTab.style.background = 'var(--accent)';
+        adminTab.style.color = '#fff';
+        userTab.style.background = 'var(--background)';
+        userTab.style.color = 'var(--text-muted)';
+        userForm.style.display = 'none';
+        adminForm.style.display = 'block';
+    }
+}
+</script>
+{% endblock %}

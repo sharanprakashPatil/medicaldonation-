@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard - Medical Hope{% endblock %}
+{% block content %}
+<div style="display: flex; gap: 2rem;">
+    <div style="width: 240px; flex-shrink: 0;">
+        <div class="glass-card" style="padding: 1rem;">
+            <h3 style="margin-bottom: 1rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">Admin Menu</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <a href="{% url 'admin_dashboard' %}" style="display: block; padding: 0.6rem 1rem; background: var(--primary); color: #fff; border-radius: 0.5rem; text-decoration: none; font-weight: 500; font-size: 0.9rem;">Dashboard</a>
+                <a href="{% url 'admin_all_campaigns' %}" style="display: block; padding: 0.6rem 1rem; background: var(--background); color: var(--text); border-radius: 0.5rem; text-decoration: none; font-weight: 500; font-size: 0.9rem;">All Campaigns</a>
+                <a href="{% url 'admin_all_transactions' %}" style="display: block; padding: 0.6rem 1rem; background: var(--background); color: var(--text); border-radius: 0.5rem; text-decoration: none; font-weight: 500; font-size: 0.9rem;">All Transactions</a>
+
+            </div>
+        </div>
+    </div>
+    <div style="flex: 1; min-width: 0;">
+
+<div style="margin-top: 0;">
+    <h2 style="color: var(--warning);">&#128197; Submitted for Review ({{ unverified|length }})</h2>
+    <div class="glass-card" style="padding: 0; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: var(--glass);">
+                <tr>
+                    <th style="padding: 1rem;">Title</th>
+                    <th style="padding: 1rem;">Patient</th>
+                    <th style="padding: 1rem;">Diagnosis</th>
+                    <th style="padding: 1rem;">Target</th>
+                    <th style="padding: 1rem;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in unverified %}
+                <tr style="border-top: 1px solid var(--surface-border);">
+                    <td style="padding: 1rem;"><a href="{% url 'admin_campaign_detail' req.id %}">{{ req.title }}</a></td>
+                    <td style="padding: 1rem;">{{ req.patient_name }}</td>
+                    <td style="padding: 1rem;">{{ req.diagnosis }}</td>
+                    <td style="padding: 1rem;">₹{{ req.goal_amount }}</td>
+                    <td style="padding: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <a href="{% url 'admin_view_documents' req.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">Review Docs</a>
+                        <a href="{% url 'verify_request' req.id %}" class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">Verify</a>
+                        <a href="{% url 'reject_request' req.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; color: var(--danger); border-color: var(--danger);">Reject</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">No requests pending verification.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="margin-top: 4rem;">
+    <h2 style="color: var(--primary);">Pending Approval ({{ unapproved|length }})</h2>
+    <div class="glass-card" style="padding: 0; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: var(--glass);">
+                <tr>
+                    <th style="padding: 1rem;">Title</th>
+                    <th style="padding: 1rem;">Seeker</th>
+                    <th style="padding: 1rem;">Goal</th>
+                    <th style="padding: 1rem;">Docs</th>
+                    <th style="padding: 1rem;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in unapproved %}
+                <tr style="border-top: 1px solid var(--surface-border);">
+                    <td style="padding: 1rem;"><a href="{% url 'admin_campaign_detail' req.id %}">{{ req.title }}</a></td>
+                    <td style="padding: 1rem;">{{ req.user.username }}</td>
+                    <td style="padding: 1rem;">₹{{ req.goal_amount }}</td>
+                    <td style="padding: 1rem;">{{ req.documents.count }} files</td>
+                    <td style="padding: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <a href="{% url 'admin_view_documents' req.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">Review Docs</a>
+                        <a href="{% url 'approve_request' req.id %}" class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; background: var(--success);">Approve</a>
+                        <a href="{% url 'reject_request' req.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; color: var(--danger); border-color: var(--danger);">Reject</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">No requests pending approval.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div style="margin-top: 4rem;">
+    <h2 style="color: var(--success);">Approved Campaigns ({{ approved|length }})</h2>
+    <div class="glass-card" style="padding: 0; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: var(--glass);">
+                <tr>
+                    <th style="padding: 1rem;">Title</th>
+                    <th style="padding: 1rem;">Raised</th>
+                    <th style="padding: 1rem;">Goal</th>
+                    <th style="padding: 1rem;">Donors</th>
+                    <th style="padding: 1rem;">Status</th>
+                    <th style="padding: 1rem;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in approved %}
+                <tr style="border-top: 1px solid var(--surface-border);">
+                    <td style="padding: 1rem;"><a href="{% url 'admin_campaign_detail' req.id %}">{{ req.title }}</a></td>
+                    <td style="padding: 1rem; font-weight: 600;">₹{{ req.amount_raised }}</td>
+                    <td style="padding: 1rem;">₹{{ req.goal_amount }}</td>
+                    <td style="padding: 1rem;">{{ req.public_donations.count }}</td>
+                    <td style="padding: 1rem;">
+                        {% if req.is_granted %}
+                            <span style="color: var(--success);">Granted</span>
+                        {% else %}
+                            <span style="color: var(--warning);">Pending Grant</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <a href="{% url 'admin_campaign_detail' req.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">View Details</a>
+                        {% if not req.is_granted %}
+                            <a href="{% url 'grant_money' req.id %}" class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; background: var(--success);">Mark Granted</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if rejected %}
+<div style="margin-top: 4rem;">
+    <h2 style="color: var(--danger);">Rejected Campaigns ({{ rejected|length }})</h2>
+    <div class="glass-card" style="padding: 0; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: var(--glass);">
+                <tr>
+                    <th style="padding: 1rem;">Title</th>
+                    <th style="padding: 1rem;">Patient</th>
+                    <th style="padding: 1rem;">Seeker</th>
+                    <th style="padding: 1rem;">Reason</th>
+                    <th style="padding: 1rem;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in rejected %}
+                <tr style="border-top: 1px solid var(--surface-border);">
+                    <td style="padding: 1rem;">{{ req.title }}</td>
+                    <td style="padding: 1rem;">{{ req.patient_name }}</td>
+                    <td style="padding: 1rem;">{{ req.user.username }}</td>
+                    <td style="padding: 1rem; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ req.rejection_reason|default:"No reason provided" }}</td>
+                    <td style="padding: 1rem;"><a href="{% url 'admin_campaign_detail' req.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+    </div>
+</div>
+{% endblock %}

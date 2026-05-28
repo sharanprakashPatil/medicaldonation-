@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Reject Campaign - Admin{% endblock %}
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline" style="margin-bottom: 1.5rem;">&larr; Back to Dashboard</a>
+    <div class="glass-card">
+        <h2 style="margin-bottom: 1rem;">Reject Campaign</h2>
+        <p><strong>Campaign:</strong> {{ req.title }}</p>
+        <p><strong>Patient:</strong> {{ req.patient_name }}</p>
+        <p><strong>Seeker:</strong> {{ req.user.username }}</p>
+        <form method="post" style="margin-top: 1.5rem;">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Reason for Rejection</label>
+                <textarea name="rejection_reason" class="form-control" rows="5" placeholder="Explain why this campaign is being rejected..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="background: var(--danger);">Confirm Rejection</button>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

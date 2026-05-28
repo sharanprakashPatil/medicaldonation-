@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Medical Hope - Medical News & Fundraising{% endblock %}
+
+{% block content %}
+{% if not user.is_staff %}
+<div class="animate-fade" style="text-align: center; padding: 4rem 0 3rem;">
+    <h1 style="font-size: 3rem; margin-bottom: 1rem; line-height: 1.1; color: var(--primary);">Medical Activities<br><span style="color: var(--accent);">Around the World</span></h1>
+    <p style="color: var(--text-muted); font-size: 1.1rem; max-width: 650px; margin: 0 auto 2rem;">Stay informed with the latest medical breakthroughs, health news, and fundraising campaigns making a difference globally.</p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        {% if not user.is_authenticated %}
+            <a href="{% url 'register' %}" class="btn btn-accent" style="padding: 0.8rem 2rem;">Join Us Today</a>
+        {% endif %}
+        {% if not user.is_authenticated or user.is_donor %}
+            <a href="{% url 'donation_list' %}" class="btn btn-outline" style="padding: 0.8rem 2rem;">Browse Campaigns</a>
+        {% endif %}
+        {% if user.is_seeker %}
+            <a href="{% url 'create_request' %}" class="btn btn-accent" style="padding: 0.8rem 2rem;">Start a Fundraiser</a>
+        {% endif %}
+    </div>
+</div>
+
+<div style="margin-top: 3rem;">
+    <h2 style="text-align: center; margin-bottom: 0.5rem;">&#128240; Latest Medical News</h2>
+    <p style="text-align: center; color: var(--text-muted); margin-bottom: 3rem;">Updates and breakthroughs from the medical world</p>
+    <div class="grid grid-3">
+        {% for blog in blogs %}
+        <div class="glass-card" style="padding: 1.5rem; display: flex; flex-direction: column;">
+            {% if blog.image_url %}
+            <div style="height: 180px; background: var(--background); border-radius: 0.5rem; margin-bottom: 1.25rem; overflow: hidden;">
+                <img src="{{ blog.image_url }}" alt="{{ blog.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            {% else %}
+            <div style="height: 180px; background: linear-gradient(135deg, var(--accent), #7c3aed); border-radius: 0.5rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 3rem; color: rgba(255,255,255,0.3);">&#128137;</span>
+            </div>
+            {% endif %}
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem;">{{ blog.title }}</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.6; flex: 1; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;">{{ blog.content }}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--surface-border);">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">{{ blog.published_at|date:"d M Y" }}</span>
+                {% if blog.source %}
+                <span style="font-size: 0.75rem; color: var(--accent);">{{ blog.source }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="glass-card" style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">&#128240;</div>
+            <h3>Stay Tuned</h3>
+            <p style="color: var(--text-muted);">Medical news and updates coming soon.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div style="margin-top: 4rem; text-align: center;">
+    <h2 style="margin-bottom: 1rem;">&#128154; Make a Difference Today</h2>
+    <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 2rem;">Every contribution, big or small, helps save lives. Join our community of givers and changemakers.</p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        {% if not user.is_authenticated or user.is_donor %}
+            <a href="{% url 'donation_list' %}" class="btn btn-primary" style="padding: 0.8rem 2rem;">Donate Now</a>
+        {% endif %}
+        {% if user.is_seeker %}
+            <a href="{% url 'my_requests' %}" class="btn btn-primary" style="padding: 0.8rem 2rem;">My Campaigns</a>
+        {% endif %}
+        <a href="{% url 'contact' %}" class="btn btn-outline" style="padding: 0.8rem 2rem;">Contact Us</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load receipt_tags %}
+{% block title %}My Donations - Medical Hope{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>My Donation History</h1>
+    <a href="{% url 'donation_list' %}" class="btn btn-accent">+ Donate Now</a>
+</div>
+
+<div class="glass-card" style="margin-bottom: 2rem;">
+    <div style="display: flex; gap: 2rem;">
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Total Donations</label>
+            <p style="font-size: 1.5rem; font-weight: 800; margin: 0;">{{ count }}</p>
+        </div>
+        <div>
+            <label style="color: var(--text-muted); font-size: 0.85rem;">Total Donated</label>
+            <p style="font-size: 1.5rem; font-weight: 800; margin: 0; color: var(--success);">&#8377; {{ total_donated }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="glass-card">
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: var(--glass);">
+                <tr>
+                    <th style="padding: 0.75rem;">#</th>
+                    <th style="padding: 0.75rem;">Campaign</th>
+                    <th style="padding: 0.75rem;">Patient</th>
+                    <th style="padding: 0.75rem;">Amount</th>
+                    <th style="padding: 0.75rem;">Payment ID</th>
+                    <th style="padding: 0.75rem;">Date & Time</th>
+                    <th style="padding: 0.75rem;">Receipt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in donations %}
+                <tr style="border-top: 1px solid var(--surface-border);">
+                    <td style="padding: 0.75rem;">{{ forloop.counter }}</td>
+                    <td style="padding: 0.75rem; font-weight: 500;">{{ d.request.title }}</td>
+                    <td style="padding: 0.75rem;">{{ d.request.patient_name }}</td>
+                    <td style="padding: 0.75rem; color: var(--success); font-weight: 600;">&#8377;{{ d.amount }}</td>
+                    <td style="padding: 0.75rem; font-family: monospace; font-size: 0.8rem;">{{ d.payment_id|short_id:"TXN" }}</td>
+                    <td style="padding: 0.75rem;">{{ d.timestamp|date:"d M Y h:i A" }}</td>
+                    <td style="padding: 0.75rem;"><a href="{% url 'donation_receipt' d.id %}" class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">&#128229; Receipt</a></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" style="padding: 2rem; text-align: center; color: var(--text-muted);">You haven't made any donations yet. <a href="{% url 'donation_list' %}">Browse campaigns</a></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

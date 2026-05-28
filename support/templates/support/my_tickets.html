@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}My Tickets - Medical Hope{% endblock %}
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>My Support Tickets</h1>
+    <a href="{% url 'create_ticket' %}" class="btn btn-accent">Create New Ticket</a>
+</div>
+<div class="glass-card" style="padding: 0; overflow: hidden;">
+    <table>
+        <thead>
+            <tr>
+                <th>Ticket ID</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td><strong>{{ ticket.ticket_id }}</strong></td>
+                <td><span style="font-size: 0.8rem; color: var(--text-muted);">{{ ticket.get_category_display }}</span></td>
+                <td>
+                    {% if ticket.status == 'OPEN' %}
+                        <span style="background: var(--warning); color: #000; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem;">Open</span>
+                    {% elif ticket.status == 'IN_PROGRESS' %}
+                        <span style="background: var(--accent); color: #fff; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem;">In Progress</span>
+                    {% elif ticket.status == 'RESOLVED' %}
+                        <span style="background: var(--success); color: #fff; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem;">Resolved</span>
+                    {% else %}
+                        <span style="background: var(--text-muted); color: #fff; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem;">Closed</span>
+                    {% endif %}
+                </td>
+                <td>{{ ticket.created_at|date:"d M Y" }}</td>
+                <td><a href="{% url 'ticket_detail' ticket.ticket_id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">View</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem;">No tickets yet. <a href="{% url 'create_ticket' %}">Create one</a></td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

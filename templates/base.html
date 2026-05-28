@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Medical Hope | Donation Platform{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="glass-nav">
+        <div class="navbar">
+            <a href="/" class="logo"><span class="logo-icon">M</span>MedicalHope</a>
+            <ul class="nav-links">
+                {% if not user.is_staff %}
+                <li><a href="{% url 'home' %}">Home</a></li>
+                {% endif %}
+                {% if not user.is_authenticated or user.is_donor %}
+                    <li><a href="{% url 'donation_list' %}">Donate</a></li>
+                {% endif %}
+                {% if user.is_authenticated %}
+                    {% if user.is_seeker %}
+                        <li><a href="{% url 'my_requests' %}">My Campaigns</a></li>
+                        <li><a href="{% url 'create_request' %}">Start Campaign</a></li>
+                    {% endif %}
+                    {% if user.is_donor %}
+                        <li><a href="{% url 'donation_list' %}">All Campaigns</a></li>
+                        <li><a href="{% url 'my_donations' %}">My Donations</a></li>
+                    {% endif %}
+                    {% if user.is_staff %}
+                        <li><a href="{% url 'admin_dashboard' %}">Admin Panel</a></li>
+                        <li><a href="{% url 'admin_ticket_list' %}">Tickets</a></li>
+                        <li style="margin-left: auto;"><a href="{% url 'profile' %}">Profile</a></li>
+                    {% else %}
+                        <li style="margin-left: auto;"><a href="{% url 'create_ticket' %}">Support</a></li>
+                        <li><a href="{% url 'profile' %}">Profile</a></li>
+                    {% endif %}
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}" class="btn btn-primary" style="padding: 0.4rem 1rem;">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container animate-fade">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert">
+                        <span style="flex: 1;">{{ message }}</span>
+                        <span onclick="this.parentElement.remove()" style="cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 0 0.25rem;">&times;</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Medical Hope Donation Platform. All rights reserved.</p>
+        <p style="font-size: 0.8rem; margin-top: 0.5rem;">Empowering lives through community support.</p>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
