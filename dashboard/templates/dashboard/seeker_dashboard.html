@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load receipt_tags %}
 {% block title %}Seeker Dashboard - Medical Hope{% endblock %}
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
@@ -37,16 +38,35 @@
             <div style="background: var(--background); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                     <span style="font-size: 0.8rem; color: var(--text-muted);">Goal Amount</span>
-                    <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">&#8377; {{ req.goal_amount }}</span>
+                    <span style="font-weight: 800; font-size: 1.1rem; color: var(--primary);">&#8377; {{ req.goal_amount|comma }}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
                     <span style="font-size: 0.8rem; color: var(--text-muted);">Raised So Far</span>
-                    <span style="font-weight: 800; font-size: 1.1rem; color: var(--success);">&#8377; {{ req.amount_raised }}</span>
+                    <span style="font-weight: 800; font-size: 1.1rem; color: var(--success);">&#8377; {{ req.amount_raised|comma }}</span>
                 </div>
                 <div class="progress-container" style="margin: 0.5rem 0 0; height: 0.6rem;">
                     <div class="progress-bar" style="width: {{ req.progress_percentage }}%; background: {% if req.progress_percentage < 30 %}var(--warning){% elif req.progress_percentage < 70 %}var(--accent){% else %}var(--success){% endif %};"></div>
                 </div>
                 <p style="text-align: right; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">{{ req.progress_percentage }}% funded</p>
+                {% if req.is_granted %}
+                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 2px dashed var(--success);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="font-size: 0.75rem; color: var(--success); font-weight: 700;">&#10004; FUNDS RECEIVED</span>
+                            <p style="font-size: 0.7rem; color: var(--text-muted); margin: 0.1rem 0 0;">
+                                {% with payout=req.payouts.last %}
+                                {% if payout %}Transferred on {{ payout.processed_at|date:"d M Y" }}{% endif %}
+                                {% endwith %}
+                            </p>
+                        </div>
+                        {% with payout=req.payouts.last %}
+                        {% if payout %}
+                        <a href="{% url 'seeker_payout_receipt' payout.id %}" class="btn btn-outline" style="padding: 0.3rem 0.8rem; font-size: 0.75rem; color: var(--success); border-color: var(--success);">&#128229; Receipt</a>
+                        {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
             {% if req.diagnosis %}
@@ -59,7 +79,7 @@
             <div style="display: flex; gap: 0.5rem;">
                 <a href="{% url 'upload_documents' req.id %}" class="btn btn-outline" style="flex: 1; font-size: 0.8rem;">&#128196; Documents</a>
                 {% if req.is_approved %}
-                    <a href="{% url 'donation_detail' req.id %}" class="btn btn-primary" style="flex: 1; font-size: 0.8rem;">&#128065; View Public</a>
+                    <a href="{% url 'edit_request' req.id %}" class="btn btn-primary" style="flex: 1; font-size: 0.8rem;">&#9998; Modify</a>
                 {% endif %}
             </div>
         </div>

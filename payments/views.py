@@ -1,12 +1,18 @@
 import razorpay
+import io
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from seekers.models import DonationRequest
-from .models import PaymentTransaction
+from .models import PaymentTransaction, CampaignPayout
 from donations.models import Donation
 from django.contrib import messages
+from django.utils import timezone
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from xhtml2pdf import pisa
 
 # Initialize Razorpay Client
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -125,3 +131,107 @@ def payment_callback(request):
             return render(request, 'payments/payment_failed.html')
     
     return redirect('home')
+
+@staff_member_required(login_url='login')
+def transfer_funds(request, pk):
+    donation_request = get_object_or_404(DonationRequest, pk=pk)
+
+    if not all([donation_request.account_holder_name, donation_request.account_number, donation_request.ifsc_code]):
+        messages.error(request, "Seeker has not provided complete bank details.")
+        return redirect('admin_dashboard')
+
+    if donation_request.is_granted:
+        messages.warning(request, "Funds already transferred for this campaign.")
+        return redirect('admin_dashboard')
+
+    amount_paise = int(donation_request.amount_raised * 100)
+    if amount_paise <= 0:
+        messages.error(request, "No funds to transfer.")
+        return redirect('admin_dashboard')
+
+    payout = CampaignPayout.objects.create(
+        request=donation_request,
+        amount=donation_request.amount_raised,
+        payout_status='PROCESSING',
+    )
+
+    try:
+        contact = client.contact.create({
+            "name": donation_request.account_holder_name,
+            "email": donation_request.user.email,
+            "type": "vendor",
+        })
+
+        fund_account = client.fund_account.create({
+            "contact_id": contact['id'],
+            "account_type": "bank_account",
+            "bank_account": {
+                "name": donation_request.account_holder_name,
+                "ifsc": donation_request.ifsc_code,
+                "account_number": donation_request.account_number,
+            },
+        })
+
+        rp_payout = client.payout.create({
+            "fund_account_id": fund_account['id'],
+            "amount": amount_paise,
+            "currency": "INR",
+            "mode": "IMPS",
+            "purpose": "payout",
+            "queue_if_low_balance": True,
+            "reference_id": f"camp_{donation_request.id}_{timezone.now().strftime('%Y%m%d%H%M%S')}",
+            "narration": f"Funds transfer for {donation_request.title}",
+        })
+
+        payout.fund_account_id = fund_account['id']
+        payout.payout_id = rp_payout['id']
+        status = rp_payout.get('status', '').upper()
+        payout.payout_status = 'SUCCESS' if status == 'PROCESSED' else status
+        payout.utr = rp_payout.get('utr', '')
+        payout.processed_at = timezone.now()
+        payout.save()
+
+        donation_request.is_granted = True
+        donation_request.save()
+
+        messages.success(request, f"₹{donation_request.amount_raised} transferred successfully to {donation_request.account_holder_name}.")
+        return redirect('payout_receipt', pk=payout.pk)
+
+    except Exception as e:
+        payout.payout_status = 'FAILED'
+        payout.save()
+        messages.error(request, f"Transfer failed: {str(e)}")
+        return redirect('admin_dashboard')
+
+def render_pdf(template_path, context):
+    html = render_to_string(template_path, context)
+    result = io.BytesIO()
+    pdf = pisa.pisaDocument(io.BytesIO(html.encode('utf-8')), result)
+    if pdf.err:
+        return None
+    return result.getvalue()
+
+@staff_member_required(login_url='login')
+def payout_receipt(request, pk):
+    payout = get_object_or_404(CampaignPayout, pk=pk)
+    if 'pdf' in request.GET:
+        pdf = render_pdf('payments/payout_receipt_content.html', {'payout': payout})
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = f"payout_receipt_{payout.id}.pdf"
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+        messages.error(request, "Failed to generate PDF.")
+    return render(request, 'payments/payout_receipt.html', {'payout': payout})
+
+@login_required
+def seeker_payout_receipt(request, pk):
+    payout = get_object_or_404(CampaignPayout, pk=pk, request__user=request.user)
+    pdf = render_pdf('payments/payout_receipt_content.html', {'payout': payout})
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = f"payout_receipt_{payout.id}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
+    messages.error(request, "Failed to generate PDF.")
+    return redirect('my_requests')

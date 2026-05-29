@@ -23,7 +23,11 @@ def donation_list(request):
 
 def donation_detail(request, pk):
     donation_request = get_object_or_404(DonationRequest, pk=pk, is_verified=True, is_approved=True, is_rejected=False)
-    return render(request, 'donations/donation_detail.html', {'donation_request': donation_request})
+    documents = donation_request.documents.all()
+    return render(request, 'donations/donation_detail.html', {
+        'donation_request': donation_request,
+        'documents': documents,
+    })
 
 @login_required
 def my_donations(request):

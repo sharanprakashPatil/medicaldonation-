@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load receipt_tags %}
+{% block title %}Transfer Receipt - Medical Hope{% endblock %}
+{% block content %}
+{% include 'payments/payout_receipt_content.html' %}
+
+<div style="text-align: center; margin-bottom: 3rem;">
+    <a href="{% url 'payout_receipt' payout.id %}?pdf=1" class="btn btn-primary" style="padding: 0.8rem 2rem; font-size: 1rem;">&#128229; Download PDF Receipt</a>
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline" style="padding: 0.8rem 2rem;">Back to Dashboard</a>
+</div>
+
+<style>
+@media print {
+    @page { margin: 0.5in; size: A4; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    nav, footer, .messages, .btn, .nav-links, [style*="text-align: center; margin-bottom: 3rem;"] { display: none !important; }
+    #receipt { box-shadow: none; border: 1px solid #ddd; margin: 0 auto; }
+}
+</style>
+{% endblock %}

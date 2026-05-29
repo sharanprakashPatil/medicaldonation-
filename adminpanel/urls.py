@@ -11,4 +11,5 @@ urlpatterns = [
     path('campaign/<int:pk>/', views.campaign_detail, name='admin_campaign_detail'),
     path('all-campaigns/', views.all_campaigns, name='admin_all_campaigns'),
     path('all-transactions/', views.all_transactions, name='admin_all_transactions'),
+    path('cancel-campaign/<int:pk>/', views.cancel_campaign, name='admin_cancel_campaign'),
 ]

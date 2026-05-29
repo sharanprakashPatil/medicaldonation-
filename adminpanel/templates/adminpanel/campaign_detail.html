@@ -28,11 +28,11 @@
         </div>
         <div>
             <label style="color: var(--text-muted); font-size: 0.85rem;">Goal Amount</label>
-            <p style="font-weight: 600;">₹{{ campaign.goal_amount }}</p>
+            <p style="font-weight: 600;">₹{{ campaign.goal_amount|comma }}</p>
         </div>
         <div>
             <label style="color: var(--text-muted); font-size: 0.85rem;">Amount Raised</label>
-            <p style="font-weight: 600; color: var(--success);">₹{{ campaign.amount_raised }}</p>
+            <p style="font-weight: 600; color: var(--success);">₹{{ campaign.amount_raised|comma }}</p>
         </div>
         <div>
             <label style="color: var(--text-muted); font-size: 0.85rem;">Total Donors</label>
@@ -75,6 +75,13 @@
         </div>
     </div>
     {% endif %}
+    <div style="margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        {% if campaign.is_approved and not campaign.is_granted and campaign.amount_raised > 0 %}
+            <a href="{% url 'transfer_funds' campaign.id %}" class="btn btn-primary" style="background: var(--success);" onclick="return confirm('Transfer ₹{{ campaign.amount_raised|comma }} to {{ campaign.account_holder_name }}?')">&#128176; Transfer Funds to Seeker</a>
+        {% elif campaign.is_granted and campaign.payouts.exists %}
+            <a href="{% url 'payout_receipt' campaign.payouts.last.id %}" class="btn btn-outline">&#128196; View Transfer Receipt</a>
+        {% endif %}
+    </div>
     {% if campaign.rejection_reason %}
     <div style="margin-top: 1rem; padding: 1rem; background: #fef2f2; border-radius: 0.5rem; border-left: 4px solid var(--danger);">
         <h4 style="color: var(--danger);">Rejection Reason</h4>
@@ -103,7 +110,7 @@
                     <td style="padding: 0.75rem;">{{ forloop.counter }}</td>
                     <td style="padding: 0.75rem; font-weight: 500;">{{ donation.donor_name }}</td>
                     <td style="padding: 0.75rem;">{{ donation.donor_email }}</td>
-                    <td style="padding: 0.75rem; color: var(--success); font-weight: 600;">₹{{ donation.amount }}</td>
+                    <td style="padding: 0.75rem; color: var(--success); font-weight: 600;">₹{{ donation.amount|comma }}</td>
                     <td style="padding: 0.75rem; font-family: monospace; font-size: 0.8rem;">{{ donation.payment_id|short_id:"TXN" }}</td>
                     <td style="padding: 0.75rem;">{{ donation.timestamp|date:"d M Y h:i A" }}</td>
                 </tr>
@@ -114,4 +121,50 @@
         </table>
     </div>
 </div>
+
+{% if campaign.payouts.all %}
+<div class="glass-card" style="margin-top: 2rem;">
+    <h3>Fund Transfer History</h3>
+    <div style="overflow-x: auto; margin-top: 1rem;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: var(--glass);">
+                <tr>
+                    <th style="padding: 0.75rem;">#</th>
+                    <th style="padding: 0.75rem;">Payout ID</th>
+                    <th style="padding: 0.75rem;">Amount</th>
+                    <th style="padding: 0.75rem;">Status</th>
+                    <th style="padding: 0.75rem;">UTR</th>
+                    <th style="padding: 0.75rem;">Date</th>
+                    <th style="padding: 0.75rem;">Receipt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in campaign.payouts.all %}
+                <tr style="border-top: 1px solid var(--surface-border);">
+                    <td style="padding: 0.75rem;">{{ forloop.counter }}</td>
+                    <td style="padding: 0.75rem; font-family: monospace; font-size: 0.8rem;">{{ p.payout_id|default:"—" }}</td>
+                    <td style="padding: 0.75rem; font-weight: 600;">₹{{ p.amount|comma }}</td>
+                    <td style="padding: 0.75rem;">
+                        {% if p.payout_status == 'SUCCESS' %}
+                            <span style="color: var(--success);">&#10003; Success</span>
+                        {% elif p.payout_status == 'FAILED' %}
+                            <span style="color: var(--danger);">&#10007; Failed</span>
+                        {% elif p.payout_status == 'PROCESSING' %}
+                            <span style="color: var(--warning);">&#9881; Processing</span>
+                        {% else %}
+                            <span>{{ p.payout_status }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 0.75rem; font-family: monospace;">{{ p.utr|default:"—" }}</td>
+                    <td style="padding: 0.75rem;">{{ p.created_at|date:"d M Y h:i A" }}</td>
+                    <td style="padding: 0.75rem;">
+                        <a href="{% url 'payout_receipt' p.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">&#128196; Receipt</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

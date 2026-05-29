@@ -76,6 +76,25 @@ def cancel_campaign(request, pk):
     return redirect('my_requests')
 
 @login_required
+def edit_request(request, pk):
+    donation_request = get_object_or_404(DonationRequest, pk=pk, user=request.user)
+    if donation_request.is_approved:
+        messages.error(request, "Cannot edit an approved campaign.")
+        return redirect('my_requests')
+    if donation_request.is_cancelled:
+        messages.error(request, "Cannot edit a cancelled campaign.")
+        return redirect('my_requests')
+    if request.method == 'POST':
+        form = DonationRequestForm(request.POST, instance=donation_request)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Campaign updated successfully.")
+            return redirect('my_requests')
+    else:
+        form = DonationRequestForm(instance=donation_request)
+    return render(request, 'seekers/edit_request.html', {'form': form, 'donation_request': donation_request})
+
+@login_required
 def my_requests(request):
     requests = DonationRequest.objects.filter(user=request.user)
     return render(request, 'seekers/my_requests.html', {'requests': requests})

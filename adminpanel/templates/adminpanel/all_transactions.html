@@ -15,7 +15,7 @@
         </div>
         <div>
             <label style="color: var(--text-muted); font-size: 0.85rem;">Total Amount Raised</label>
-            <p style="font-size: 1.5rem; font-weight: 800; margin: 0; color: var(--success);">₹{{ total_amount }}</p>
+            <p style="font-size: 1.5rem; font-weight: 800; margin: 0; color: var(--success);">₹{{ total_amount|comma }}</p>
         </div>
     </div>
 </div>
@@ -44,7 +44,7 @@
                     </td>
                     <td style="padding: 0.75rem; font-weight: 500;">{{ donation.donor_name }}</td>
                     <td style="padding: 0.75rem;">{{ donation.donor_email }}</td>
-                    <td style="padding: 0.75rem; color: var(--success); font-weight: 600;">₹{{ donation.amount }}</td>
+                    <td style="padding: 0.75rem; color: var(--success); font-weight: 600;">₹{{ donation.amount|comma }}</td>
                     <td style="padding: 0.75rem; font-family: monospace; font-size: 0.8rem;">{{ donation.payment_id|short_id:"TXN" }}</td>
                     <td style="padding: 0.75rem;">{{ donation.timestamp|date:"d M Y h:i A" }}</td>
                 </tr>

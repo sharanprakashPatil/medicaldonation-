@@ -82,11 +82,28 @@ def all_campaigns(request):
     for c in campaigns:
         c.donation_count = c.public_donations.count()
     total_collected = sum(c.amount_raised for c in campaigns)
+    active_count = campaigns.filter(is_cancelled=False, is_rejected=False).count()
+    cancelled_count = campaigns.filter(is_cancelled=True).count()
     context = {
         'campaigns': campaigns,
         'total_collected': total_collected,
+        'active_count': active_count,
+        'cancelled_count': cancelled_count,
     }
     return render(request, 'adminpanel/all_campaigns.html', context)
+
+@staff_member_required(login_url='login')
+def cancel_campaign(request, pk):
+    donation_request = get_object_or_404(DonationRequest, pk=pk)
+    if donation_request.is_cancelled:
+        messages.warning(request, f"Campaign '{donation_request.title}' is already cancelled.")
+    else:
+        donation_request.is_cancelled = True
+        donation_request.is_approved = False
+        donation_request.is_verified = False
+        donation_request.save()
+        messages.success(request, f"Campaign '{donation_request.title}' has been cancelled.")
+    return redirect('admin_all_campaigns')
 
 @staff_member_required(login_url='login')
 def all_transactions(request):

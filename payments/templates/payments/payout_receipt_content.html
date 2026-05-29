@@ -1,0 +1,127 @@
+{% load receipt_tags %}
+<div id="receipt" style="max-width: 750px; margin: 2rem auto; background: #fff; border-radius: 0.5rem; box-shadow: 0 4px 24px rgba(0,0,0,0.1); overflow: hidden; font-family: Arial, Helvetica, sans-serif;">
+    <div style="padding: 2.5rem 2.5rem 1.5rem;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="vertical-align: top;">
+                    <div style="font-size: 1.8rem; font-weight: 900; color: #1e40af; letter-spacing: 0.05em; line-height: 1.2;">MEDICAL<br>HOPE</div>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.75rem; color: #64748b;">Empowering Lives Through<br>Community Support</p>
+                </td>
+                <td style="text-align: right; vertical-align: top;">
+                    <div style="display: inline-block; border: 2px solid #059669; border-radius: 0.25rem; padding: 0.4rem 1.2rem;">
+                        <span style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: #059669; font-weight: 700;">&#10003; FUNDS TRANSFERRED</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="padding: 0 2.5rem;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding-bottom: 0.25rem; font-size: 0.85rem; color: #64748b;">123 Healthcare Avenue, MG Road, Mumbai - 400001</td>
+                <td style="text-align: right; padding-bottom: 0.25rem; font-size: 0.85rem; color: #64748b;">+91 98765 43210 | info@medicalhope.org</td>
+            </tr>
+        </table>
+        <hr style="border: none; border-top: 2px solid #e2e8f0; margin: 0.75rem 0;">
+        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 0 0 1.25rem;">
+    </div>
+
+    <div style="padding: 0 2.5rem 1.5rem;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="vertical-align: top; width: 50%;">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 0.5rem;">Recipient (Campaign Seeker)</div>
+                    <p style="font-weight: 600; font-size: 1rem; margin: 0 0 0.15rem; color: #1e293b;">{{ payout.request.account_holder_name }}</p>
+                    <p style="font-size: 0.85rem; margin: 0; color: #64748b;">{{ payout.request.user.email }}</p>
+                </td>
+                <td style="vertical-align: top; text-align: right; width: 50%;">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 0.5rem;">Campaign</div>
+                    <p style="font-weight: 600; font-size: 1rem; margin: 0 0 0.15rem; color: #1e293b;">{{ payout.request.title }}</p>
+                    <p style="font-size: 0.85rem; margin: 0; color: #64748b;">Patient: {{ payout.request.patient_name }}</p>
+                    <p style="font-size: 0.85rem; margin: 0; color: #64748b;">{{ payout.request.hospital_name }}</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="padding: 0 2.5rem 1.5rem;">
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.5rem; padding: 1rem;">
+            <h4 style="margin: 0 0 0.75rem; font-size: 0.85rem; color: #16a34a;">Bank Account Details (Transferred To)</h4>
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                <tr><td style="padding: 0.25rem 0; color: #64748b;">Account Holder</td><td style="padding: 0.25rem 0; font-weight: 600;">{{ payout.request.account_holder_name }}</td></tr>
+                <tr><td style="padding: 0.25rem 0; color: #64748b;">Account Number</td><td style="padding: 0.25rem 0; font-weight: 600;">****{{ payout.request.account_number|slice:"-4:" }}</td></tr>
+                <tr><td style="padding: 0.25rem 0; color: #64748b;">Bank</td><td style="padding: 0.25rem 0; font-weight: 600;">{{ payout.request.bank_name }}</td></tr>
+                <tr><td style="padding: 0.25rem 0; color: #64748b;">IFSC</td><td style="padding: 0.25rem 0; font-weight: 600;">{{ payout.request.ifsc_code }}</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div style="background: #f8fafc; padding: 1.5rem 2.5rem;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Transfer Receipt No.</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-family: monospace; font-size: 0.85rem; font-weight: 700; color: #1e293b;">PYT-{{ payout.id|stringformat:"05d" }}</td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Payout ID (Razorpay)</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-family: monospace; font-size: 0.85rem; color: #1e293b;">{{ payout.payout_id|default:"—" }}</td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Fund Account ID</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-family: monospace; font-size: 0.85rem; color: #1e293b;">{{ payout.fund_account_id|default:"—" }}</td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">UTR</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-family: monospace; font-weight: 600; color: #1e293b;">{{ payout.utr|default:"—" }}</td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Status</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-weight: 600;">
+                    {% if payout.payout_status == 'SUCCESS' %}
+                        <span style="color: #059669;">Success</span>
+                    {% elif payout.payout_status == 'FAILED' %}
+                        <span style="color: #dc2626;">Failed</span>
+                    {% elif payout.payout_status == 'PROCESSING' %}
+                        <span style="color: #d97706;">Processing</span>
+                    {% else %}
+                        <span>{{ payout.payout_status }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Transfer Mode</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-weight: 500; color: #1e293b;">IMPS</td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Transfer Date</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-weight: 500; color: #1e293b;">{% if payout.processed_at %}{{ payout.processed_at|date:"d M Y" }}{% else %}{{ payout.created_at|date:"d M Y" }}{% endif %}</td>
+            </tr>
+            <tr style="border-top: 1px solid #e2e8f0;">
+                <td style="padding: 0.5rem 0; font-size: 0.85rem; color: #64748b;">Transfer Time</td>
+                <td style="padding: 0.5rem 0; text-align: right; font-weight: 500; color: #1e293b;">{% if payout.processed_at %}{{ payout.processed_at|date:"h:i A" }}{% else %}{{ payout.created_at|date:"h:i A" }}{% endif %}</td>
+            </tr>
+            <tr style="border-top: 2px solid #059669;">
+                <td style="padding: 0.75rem 0; font-size: 1rem; font-weight: 700; color: #1e293b;">Total Amount Transferred</td>
+                <td style="padding: 0.75rem 0; text-align: right; font-size: 1.4rem; font-weight: 800; color: #059669;">&#8377; {{ payout.amount|comma }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="padding: 1.5rem 2.5rem 2.5rem; text-align: center; position: relative;">
+        <div style="display: inline-block; width: 110px; height: 110px; border: 4px double #059669; border-radius: 50%; position: relative; margin-bottom: 0.5rem; background: #f0fdf4;">
+            <div style="position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; border: 1px solid #059669; border-radius: 50%;"></div>
+            <div style="position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid #059669; border-radius: 50%;"></div>
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                <div style="font-size: 0.55rem; font-weight: 900; color: #059669; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1.2;">MEDICAL<br>HOPE</div>
+                <div style="width: 24px; height: 2px; background: #059669; margin: 4px auto;"></div>
+                <div style="font-size: 0.65rem; color: #059669; font-weight: 700;">&#10003;</div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 0; right: 0; text-align: center;">
+                <span style="font-size: 0.4rem; color: #059669; letter-spacing: 0.1em;">SIGNATORY</span>
+            </div>
+        </div>
+        <p style="font-size: 0.75rem; color: #64748b; margin: 0.25rem 0 0; font-weight: 500;">Authorised Signatory</p>
+        <p style="font-size: 0.65rem; color: #94a3b8; margin: 0.25rem 0 0; font-size: 0.7rem;">This fund transfer was processed through Razorpay Payouts. This is a computer-generated receipt.</p>
+    </div>
+</div>

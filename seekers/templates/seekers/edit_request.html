@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Edit Campaign - Medical Hope{% endblock %}
+{% block content %}
+<div class="glass-card" style="max-width: 800px; margin: 2rem auto;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;">
+        <a href="{% url 'my_requests' %}" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">&larr; Back</a>
+        <h2 style="margin: 0;">Edit Campaign</h2>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Campaign Title</label>
+                <input type="text" name="title" class="form-control" required value="{{ form.title.value|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label>Patient Name</label>
+                <input type="text" name="patient_name" class="form-control" required value="{{ form.patient_name.value|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label>Goal Amount (₹)</label>
+                <input type="number" name="goal_amount" class="form-control" required value="{{ form.goal_amount.value|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label>Hospital Name</label>
+                <input type="text" name="hospital_name" class="form-control" required value="{{ form.hospital_name.value|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label>Diagnosis</label>
+                <input type="text" name="diagnosis" class="form-control" required value="{{ form.diagnosis.value|default:'' }}">
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Detailed Description</label>
+                <textarea name="description" class="form-control" rows="5" required>{{ form.description.value|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem; padding: 1.5rem; background: var(--background); border-radius: 0.75rem; border: 1px solid var(--surface-border);">
+            <h3 style="margin: 0 0 0.25rem; font-size: 1.1rem;">&#127974; Bank Details for Fund Transfer</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 1.25rem;">Update your bank information for fund transfers.</p>
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div class="form-group">
+                    <label>Account Holder Name</label>
+                    <input type="text" name="account_holder_name" class="form-control" value="{{ form.account_holder_name.value|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Account Number</label>
+                    <input type="text" name="account_number" class="form-control" value="{{ form.account_number.value|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Bank Name</label>
+                    <input type="text" name="bank_name" class="form-control" value="{{ form.bank_name.value|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label>IFSC Code</label>
+                    <input type="text" name="ifsc_code" class="form-control" value="{{ form.ifsc_code.value|default:'' }}" required>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>UPI ID <span style="font-size: 0.75rem; color: var(--text-muted);">(optional)</span></label>
+                    <input type="text" name="upi_id" class="form-control" value="{{ form.upi_id.value|default:'' }}">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

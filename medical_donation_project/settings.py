@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'adminpanel',
     'dashboard',
     'support',
+    'chatbot',
 ]
 
 MIDDLEWARE = [

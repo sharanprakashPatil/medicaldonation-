@@ -1,72 +1,198 @@
 {% extends 'base.html' %}
+{% load receipt_tags %}
 {% block title %}All Campaigns - Admin{% endblock %}
 {% block content %}
-<div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
-    <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">Back to Dashboard</a>
-    <h1 style="margin: 0;">All Campaigns</h1>
+<style>
+  .campaign-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.5rem;
+  }
+  .campaign-card {
+    background: var(--glass);
+    border-radius: 1rem;
+    border: 1px solid var(--surface-border);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .campaign-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  }
+  .campaign-card .header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--surface-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .campaign-card .header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+  .campaign-card .body {
+    padding: 1.25rem 1.5rem;
+  }
+  .campaign-card .body .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+    font-size: 0.9rem;
+  }
+  .campaign-card .body .row .label {
+    color: var(--text-muted);
+  }
+  .campaign-card .body .row .value {
+    font-weight: 600;
+  }
+  .campaign-card .footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--surface-border);
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .badge-success { background: #d1fae5; color: #065f46; }
+  .badge-danger { background: #fee2e2; color: #991b1b; }
+  .badge-warning { background: #fef3c7; color: #92400e; }
+  .badge-info { background: #dbeafe; color: #1e40af; }
+  .badge-muted { background: #f1f5f9; color: #475569; }
+  .stats-bar {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .stat-box {
+    background: var(--glass);
+    border: 1px solid var(--surface-border);
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    flex: 1;
+    min-width: 140px;
+  }
+  .stat-box .num {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+  }
+  .stat-box .lbl {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+</style>
+
+<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+  <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">&larr; Dashboard</a>
+  <h1 style="margin: 0;">All Campaigns</h1>
 </div>
 
-<div class="glass-card" style="margin-bottom: 2rem;">
-    <div style="display: flex; gap: 2rem;">
-        <div>
-            <label style="color: var(--text-muted); font-size: 0.85rem;">Total Campaigns</label>
-            <p style="font-size: 1.5rem; font-weight: 800; margin: 0;">{{ campaigns|length }}</p>
-        </div>
-        <div>
-            <label style="color: var(--text-muted); font-size: 0.85rem;">Total Funds Collected</label>
-            <p style="font-size: 1.5rem; font-weight: 800; margin: 0; color: var(--success);">₹{{ total_collected }}</p>
-        </div>
-    </div>
+<div class="stats-bar">
+  <div class="stat-box">
+    <p class="lbl">Total Campaigns</p>
+    <p class="num" style="color: var(--accent);">{{ campaigns|length }}</p>
+  </div>
+  <div class="stat-box">
+    <p class="lbl">Active</p>
+    <p class="num" style="color: var(--success);">{{ active_count }}</p>
+  </div>
+  <div class="stat-box">
+    <p class="lbl">Cancelled</p>
+    <p class="num" style="color: var(--danger);">{{ cancelled_count }}</p>
+  </div>
+  <div class="stat-box">
+    <p class="lbl">Total Collected</p>
+    <p class="num" style="color: var(--success);">₹{{ total_collected|comma }}</p>
+  </div>
 </div>
 
-<div class="glass-card">
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead style="background: var(--glass);">
-                <tr>
-                    <th style="padding: 0.75rem;">#</th>
-                    <th style="padding: 0.75rem;">Campaign</th>
-                    <th style="padding: 0.75rem;">Seeker</th>
-                    <th style="padding: 0.75rem;">Goal</th>
-                    <th style="padding: 0.75rem;">Collected</th>
-                    <th style="padding: 0.75rem;">Donors</th>
-                    <th style="padding: 0.75rem;">Status</th>
-                    <th style="padding: 0.75rem;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in campaigns %}
-                <tr style="border-top: 1px solid var(--surface-border);">
-                    <td style="padding: 0.75rem;">{{ forloop.counter }}</td>
-                    <td style="padding: 0.75rem; font-weight: 600;">{{ c.title }}</td>
-                    <td style="padding: 0.75rem;">{{ c.user.username }}</td>
-                    <td style="padding: 0.75rem;">₹{{ c.goal_amount }}</td>
-                    <td style="padding: 0.75rem; color: var(--success); font-weight: 600;">₹{{ c.amount_raised }}</td>
-                    <td style="padding: 0.75rem;">{{ c.donation_count }}</td>
-                    <td style="padding: 0.75rem;">
-                        {% if c.is_cancelled %}
-                            <span style="color: #64748b;">Cancelled</span>
-                        {% elif c.is_rejected %}
-                            <span style="color: var(--danger);">Rejected</span>
-                        {% elif c.is_granted %}
-                            <span style="color: var(--success);">Granted</span>
-                        {% elif c.is_approved %}
-                            <span style="color: var(--success);">Approved</span>
-                        {% elif c.is_verified %}
-                            <span style="color: var(--accent);">Verified</span>
-                        {% else %}
-                            <span style="color: var(--warning);">Pending</span>
-                        {% endif %}
-                    </td>
-                    <td style="padding: 0.75rem;">
-                        <a href="{% url 'admin_campaign_detail' c.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">View</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="8" style="padding: 2rem; text-align: center; color: var(--text-muted);">No campaigns found.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="campaign-grid">
+  {% for c in campaigns %}
+  <div class="campaign-card">
+    <div class="header">
+      <h3 title="{{ c.title }}">{{ c.title }}</h3>
+      <span class="badge
+        {% if c.is_cancelled %}badge-muted
+        {% elif c.is_rejected %}badge-danger
+        {% elif c.is_granted %}badge-success
+        {% elif c.is_approved %}badge-success
+        {% elif c.is_verified %}badge-info
+        {% else %}badge-warning{% endif %}">
+        {% if c.is_cancelled %}Cancelled
+        {% elif c.is_rejected %}Rejected
+        {% elif c.is_granted %}Granted
+        {% elif c.is_approved %}Approved
+        {% elif c.is_verified %}Verified
+        {% else %}Pending{% endif %}
+      </span>
     </div>
+    <div class="body">
+      <div class="row">
+        <span class="label">Patient</span>
+        <span class="value">{{ c.patient_name }}</span>
+      </div>
+      <div class="row">
+        <span class="label">Diagnosis</span>
+        <span class="value">{{ c.diagnosis }}</span>
+      </div>
+      <div class="row">
+        <span class="label">Hospital</span>
+        <span class="value">{{ c.hospital_name }}</span>
+      </div>
+      <div class="row">
+        <span class="label">Seeker</span>
+        <span class="value">{{ c.user.username }}</span>
+      </div>
+      <div class="row">
+        <span class="label">Goal Amount</span>
+        <span class="value">₹{{ c.goal_amount|comma }}</span>
+      </div>
+      <div class="row">
+        <span class="label">Collected</span>
+        <span class="value" style="color: var(--success);">₹{{ c.amount_raised|comma }}</span>
+      </div>
+      <div class="row">
+        <span class="label">Total Donors</span>
+        <span class="value">{{ c.donation_count }}</span>
+      </div>
+      <div class="row">
+        <span class="label">Created</span>
+        <span class="value">{{ c.created_at|date:"d M Y" }}</span>
+      </div>
+      {% if c.is_cancelled %}
+      <div class="row">
+        <span class="label">Cancelled</span>
+        <span class="value" style="color: var(--danger);">Yes</span>
+      </div>
+      {% endif %}
+      {% if c.is_rejected and c.rejection_reason %}
+      <div class="row">
+        <span class="label">Rejection Reason</span>
+        <span class="value" style="color: var(--danger); font-size: 0.8rem;">{{ c.rejection_reason }}</span>
+      </div>
+      {% endif %}
+    </div>
+    <div class="footer">
+      <a href="{% url 'admin_campaign_detail' c.id %}" class="btn btn-outline" style="padding: 0.4rem 1rem; font-size: 0.8rem;">View Details</a>
+      {% if not c.is_cancelled and not c.is_rejected %}
+      <a href="{% url 'admin_cancel_campaign' c.id %}" class="btn btn-outline" style="padding: 0.4rem 1rem; font-size: 0.8rem; color: var(--danger); border-color: var(--danger);" onclick="return confirm('Are you sure you want to cancel campaign &#39;{{ c.title }}&#39;? This will stop all fundraising.')">Cancel Campaign</a>
+      {% endif %}
+    </div>
+  </div>
+  {% empty %}
+  <div class="glass-card" style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+    <p style="color: var(--text-muted); font-size: 1.1rem;">No campaigns found.</p>
+  </div>
+  {% endfor %}
 </div>
 {% endblock %}

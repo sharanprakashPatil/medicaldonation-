@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load receipt_tags %}
 {% block title %}Admin Dashboard - Medical Hope{% endblock %}
 {% block content %}
 <div style="display: flex; gap: 2rem;">
@@ -34,7 +35,7 @@
                     <td style="padding: 1rem;"><a href="{% url 'admin_campaign_detail' req.id %}">{{ req.title }}</a></td>
                     <td style="padding: 1rem;">{{ req.patient_name }}</td>
                     <td style="padding: 1rem;">{{ req.diagnosis }}</td>
-                    <td style="padding: 1rem;">₹{{ req.goal_amount }}</td>
+                    <td style="padding: 1rem;">₹{{ req.goal_amount|comma }}</td>
                     <td style="padding: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         <a href="{% url 'admin_view_documents' req.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">Review Docs</a>
                         <a href="{% url 'verify_request' req.id %}" class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">Verify</a>
@@ -67,7 +68,7 @@
                 <tr style="border-top: 1px solid var(--surface-border);">
                     <td style="padding: 1rem;"><a href="{% url 'admin_campaign_detail' req.id %}">{{ req.title }}</a></td>
                     <td style="padding: 1rem;">{{ req.user.username }}</td>
-                    <td style="padding: 1rem;">₹{{ req.goal_amount }}</td>
+                    <td style="padding: 1rem;">₹{{ req.goal_amount|comma }}</td>
                     <td style="padding: 1rem;">{{ req.documents.count }} files</td>
                     <td style="padding: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         <a href="{% url 'admin_view_documents' req.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">Review Docs</a>
@@ -101,8 +102,8 @@
                 {% for req in approved %}
                 <tr style="border-top: 1px solid var(--surface-border);">
                     <td style="padding: 1rem;"><a href="{% url 'admin_campaign_detail' req.id %}">{{ req.title }}</a></td>
-                    <td style="padding: 1rem; font-weight: 600;">₹{{ req.amount_raised }}</td>
-                    <td style="padding: 1rem;">₹{{ req.goal_amount }}</td>
+                    <td style="padding: 1rem; font-weight: 600;">₹{{ req.amount_raised|comma }}</td>
+                    <td style="padding: 1rem;">₹{{ req.goal_amount|comma }}</td>
                     <td style="padding: 1rem;">{{ req.public_donations.count }}</td>
                     <td style="padding: 1rem;">
                         {% if req.is_granted %}
@@ -113,8 +114,10 @@
                     </td>
                     <td style="padding: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         <a href="{% url 'admin_campaign_detail' req.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">View Details</a>
-                        {% if not req.is_granted %}
-                            <a href="{% url 'grant_money' req.id %}" class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; background: var(--success);">Mark Granted</a>
+                        {% if not req.is_granted and req.amount_raised > 0 %}
+                            <a href="{% url 'transfer_funds' req.id %}" class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; background: var(--success);" onclick="return confirm('Transfer funds to {% if req.account_holder_name %}{{ req.account_holder_name }}{% else %}the seeker{% endif %}?')">Transfer Funds</a>
+                        {% elif req.is_granted and req.payouts.exists %}
+                            <a href="{% url 'payout_receipt' req.payouts.last.id %}" class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;">View Receipt</a>
                         {% endif %}
                     </td>
                 </tr>

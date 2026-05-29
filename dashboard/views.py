@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from seekers.models import DonationRequest
@@ -7,6 +7,15 @@ from .models import MedicalBlog
 def home(request):
     blogs = MedicalBlog.objects.filter(is_active=True)[:6]
     return render(request, 'home.html', {'blogs': blogs})
+
+def blog_list(request):
+    blogs = MedicalBlog.objects.filter(is_active=True)
+    return render(request, 'dashboard/blog_list.html', {'blogs': blogs})
+
+def blog_detail(request, pk):
+    blog = get_object_or_404(MedicalBlog, pk=pk, is_active=True)
+    recent = MedicalBlog.objects.filter(is_active=True).exclude(pk=pk)[:3]
+    return render(request, 'dashboard/blog_detail.html', {'blog': blog, 'recent': recent})
 
 @login_required
 def dashboard(request):
